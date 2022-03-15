@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { interval, Subject, Subscription } from 'rxjs';
 import { SseService } from './sse.service';
+// import { NgSseService } from '@rionkj/ng-sse';
 
 @Component({
   selector: 'app-root',

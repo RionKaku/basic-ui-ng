@@ -88,15 +88,18 @@ export class SseService {
         currentSubject
       )
     );
-    subscription.add(
-      this.createFromEvent(
-        this.sseMap
-          .get(url)
-          ?.get(SSE_SERVICE_CONFIG.DEFAULT_EVENTSOURCE_KEY) as EventSource,
-        ERROR_MESSAGE_TYPE,
-        currentSubject
-      )
-    );
+    if (exSubscription === undefined) {
+      subscription.add(
+        this.createFromEvent(
+          this.sseMap
+            .get(url)
+            ?.get(SSE_SERVICE_CONFIG.DEFAULT_EVENTSOURCE_KEY) as EventSource,
+          ERROR_MESSAGE_TYPE,
+          currentSubject
+        )
+      );
+    }
+
     return subscription;
   }
 
