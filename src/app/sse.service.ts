@@ -47,55 +47,18 @@ export class SseService {
         ?.set(SSE_SERVICE_CONFIG.DEFAULT_EVENTSOURCE_KEY, new EventSource(url))
         .set(
           SSE_SERVICE_CONFIG.DEFAULT_SUBSCRIPTION_KEY,
-          new Subscription()
-            .add(
-              this.createFromEvent(
-                this.sseMap
-                  .get(url)
-                  ?.get(
-                    SSE_SERVICE_CONFIG.DEFAULT_EVENTSOURCE_KEY
-                  ) as EventSource,
-                type,
-                currentSubject
-              )
-            )
-            .add(
-              this.createFromEvent(
-                this.sseMap
-                  .get(url)
-                  ?.get(
-                    SSE_SERVICE_CONFIG.DEFAULT_EVENTSOURCE_KEY
-                  ) as EventSource,
-                ERROR_MESSAGE_TYPE,
-                currentSubject
-              )
-            )
+          this.createSubscription(url, type, currentSubject)
         )
         .set(type, currentSubject);
     } else if (!this.sseMap.get(url)?.has(type)) {
-      (
+      this.createSubscription(
+        url,
+        type,
+        currentSubject,
         this.sseMap
           .get(url)
           ?.get(SSE_SERVICE_CONFIG.DEFAULT_SUBSCRIPTION_KEY) as Subscription
-      )
-        .add(
-          this.createFromEvent(
-            this.sseMap
-              .get(url)
-              ?.get(SSE_SERVICE_CONFIG.DEFAULT_EVENTSOURCE_KEY) as EventSource,
-            type,
-            currentSubject
-          )
-        )
-        .add(
-          this.createFromEvent(
-            this.sseMap
-              .get(url)
-              ?.get(SSE_SERVICE_CONFIG.DEFAULT_EVENTSOURCE_KEY) as EventSource,
-            ERROR_MESSAGE_TYPE,
-            currentSubject
-          )
-        );
+      );
       this.sseMap.get(url)?.set(type, currentSubject);
     }
 
@@ -107,6 +70,34 @@ export class SseService {
       .get(url)
       ?.get(SSE_SERVICE_CONFIG.DEFAULT_EVENTSOURCE_KEY) as EventSource;
     this.closeConnection(eventSource);
+  }
+
+  private createSubscription(
+    url: string,
+    type: string,
+    currentSubject: Subject<any>,
+    exSubscription?: Subscription
+  ): Subscription {
+    const subscription = exSubscription ?? new Subscription();
+    subscription.add(
+      this.createFromEvent(
+        this.sseMap
+          .get(url)
+          ?.get(SSE_SERVICE_CONFIG.DEFAULT_EVENTSOURCE_KEY) as EventSource,
+        type,
+        currentSubject
+      )
+    );
+    subscription.add(
+      this.createFromEvent(
+        this.sseMap
+          .get(url)
+          ?.get(SSE_SERVICE_CONFIG.DEFAULT_EVENTSOURCE_KEY) as EventSource,
+        ERROR_MESSAGE_TYPE,
+        currentSubject
+      )
+    );
+    return subscription;
   }
 
   private createFromEvent(
