@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { SseService } from './sse.service';
-// import { NgSseService } from '@rionkj/ng-sse';
+// import { SseService } from './sse.service';
+import { NgSseService } from '@rionkj/ng-sse';
 
 @Component({
   selector: 'app-root',
@@ -8,7 +8,7 @@ import { SseService } from './sse.service';
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent implements OnInit {
-  constructor(private sseService: SseService) {}
+  constructor(private sseService: NgSseService) {}
 
   ngOnInit(): void {
     this.sseService.getServerSentEvent('http://localhost:3000/sse').subscribe({
