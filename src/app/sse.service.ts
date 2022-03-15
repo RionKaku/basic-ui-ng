@@ -34,6 +34,13 @@ export class SseService {
     Map<string, EventSource | Subject<any> | Subscription>
   > = new Map();
 
+  /**
+   *
+   * Creat an new SSE connection or use the existing one
+   * @param url The sse api endpoint
+   * @param type The messtype except 'error', default value is 'message'
+   * @returns Subject
+   */
   getServerSentEvent(
     url: string,
     type: string = SSE_SERVICE_CONFIG.DEFAULT_MESSAGE_TYPE
@@ -50,7 +57,7 @@ export class SseService {
           this.createSubscription(url, type, currentSubject)
         )
         .set(type, currentSubject);
-    } else if (!this.sseMap.get(url)?.has(type)) {
+    } else if (!this.sseMap.get(url)?.has(type) && type != ERROR_MESSAGE_TYPE) {
       this.createSubscription(
         url,
         type,
@@ -65,6 +72,12 @@ export class SseService {
     return this.sseMap.get(url)?.get(type) as Subject<any>;
   }
 
+  /**
+   *
+   * Close an existing SSE connection
+   * @param url The sse api endpoint
+   * @returns void
+   */
   closeServerSentEvent(url: string): void {
     const eventSource = this.sseMap
       .get(url)

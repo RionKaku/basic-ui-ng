@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-// import { SseService } from './sse.service';
+import { SseService } from './sse.service';
 import { NgSseService } from '@rionkj/ng-sse';
 
 @Component({
@@ -20,17 +20,27 @@ export class AppComponent implements OnInit {
       },
     });
 
-    setTimeout(() => {
-      this.sseService
-        .getServerSentEvent('http://localhost:3000/sse')
-        .subscribe({
-          next: (res) => {
-            console.log(res);
-          },
-          error: (e) => {
-            console.warn(e);
-          },
-        });
-    }, 5000);
+    this.sseService
+      .getServerSentEvent('http://localhost:3000/sse', 'sselib_message')
+      .subscribe({
+        next: (res) => {
+          console.log(res);
+        },
+        error: (e) => {
+          console.warn(e);
+        },
+      });
+
+    this.sseService
+      .getServerSentEvent('http://localhost:3000/sse', 'sselib_error')
+      .subscribe({
+        next: (res) => {
+          console.log('from error res');
+          console.log(res);
+        },
+        error: (e) => {
+          console.warn(e);
+        },
+      });
   }
 }
