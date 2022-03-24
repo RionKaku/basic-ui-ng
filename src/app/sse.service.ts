@@ -1,19 +1,3 @@
-// ************Server Sent Events Fields*************
-// ==================================================
-// event
-// A string identifying the type of event described. If this is specified, an event will be dispatched on the browser to the listener for the specified event name; the website source code should use addEventListener() to listen for named events. The onmessage handler is called if no event name is specified for a message.
-
-// data
-// The data field for the message. When the EventSource receives multiple consecutive lines that begin with data:, it concatenates them, inserting a newline character between each one. Trailing newlines are removed.
-
-// id
-// The event ID to set the EventSource object's last event ID value.
-
-// retry
-// The reconnection time. If the connection to the server is lost, the browser will wait for the specified time before attempting to reconnect. This must be an integer, specifying the reconnection time in milliseconds. If a non-integer value is specified, the field is ignored.
-
-// All other field names are ignored.
-// ==================================================
 import { Injectable } from '@angular/core';
 import { fromEvent, Subject, Subscription } from 'rxjs';
 
