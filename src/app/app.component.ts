@@ -1,6 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { SseService } from './sse.service';
-import { NgSseService } from '@rionkj/ng-sse';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { animationFrameScheduler, interval, take } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -8,39 +7,20 @@ import { NgSseService } from '@rionkj/ng-sse';
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent implements OnInit {
-  constructor(private sseService: NgSseService) {}
+  @ViewChild('animate') animate!: ElementRef;
 
-  ngOnInit(): void {
-    this.sseService.getServerSentEvent('http://localhost:3000/sse').subscribe({
-      next: (res) => {
-        console.log(res);
-      },
-      error: (e) => {
-        console.warn(e);
+  animateSub = interval(0, animationFrameScheduler);
+
+  constructor() {}
+
+  ngAfterViewInit() {
+    this.animateSub.pipe(take(60)).subscribe({
+      next: () => {
+        this.animate.nativeElement.style.height =
+          this.animate.nativeElement.offsetHeight + 1 + 'px';
       },
     });
-
-    this.sseService
-      .getServerSentEvent('http://localhost:3000/sse', 'sselib_message')
-      .subscribe({
-        next: (res) => {
-          console.log(res);
-        },
-        error: (e) => {
-          console.warn(e);
-        },
-      });
-
-    this.sseService
-      .getServerSentEvent('http://localhost:3000/sse', 'sselib_error')
-      .subscribe({
-        next: (res) => {
-          console.log('from error res');
-          console.log(res);
-        },
-        error: (e) => {
-          console.warn(e);
-        },
-      });
   }
+
+  ngOnInit(): void {}
 }
