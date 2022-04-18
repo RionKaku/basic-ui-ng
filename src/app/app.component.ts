@@ -14,10 +14,14 @@ export class AppComponent implements OnInit {
   constructor() {}
 
   ngAfterViewInit() {
+    let a = performance.now();
     this.animateSub.pipe(take(60)).subscribe({
       next: () => {
         this.animate.nativeElement.style.height =
           this.animate.nativeElement.offsetHeight + 1 + 'px';
+      },
+      complete: () => {
+        console.log(performance.now() - a);
       },
     });
   }
