@@ -1,14 +1,10 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ScrollSectionDirective } from './directive/scroll-section.directive';
-import { ScrollAnchorDirective } from './directive/scroll-anchor.directive';
+import { AnchorModule } from './anchor/anchor.module';
 
 @NgModule({
-  declarations: [
-    ScrollSectionDirective,
-    ScrollAnchorDirective
-  ],
-  imports: [CommonModule],
-  exports: [CommonModule],
+  declarations: [],
+  imports: [CommonModule, AnchorModule],
+  exports: [CommonModule, AnchorModule],
 })
 export class SharedModule {}

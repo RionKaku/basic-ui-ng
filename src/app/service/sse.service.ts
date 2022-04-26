@@ -9,48 +9,57 @@ const SSE_SERVICE_CONFIG = {
 
 const ERROR_MESSAGE_TYPE: string = 'error';
 
+type SseMap = Map<
+  string,
+  Map<string, EventSource | Subject<any> | Subscription>
+>;
+
 @Injectable({
   providedIn: 'root',
 })
 export class SseService {
-  private sseMap: Map<
-    string,
-    Map<string, EventSource | Subject<any> | Subscription>
-  > = new Map();
+  private sseMap: SseMap = new Map();
 
   /**
    *
    * Creat an new SSE connection or use the existing one
    * @param url The sse api endpoint
-   * @param type The messtype except 'error', default value is 'message'
+   * @param type Default value 'message', except 'error',
    * @returns Subject
    */
   getServerSentEvent(
     url: string,
     type: string = SSE_SERVICE_CONFIG.DEFAULT_MESSAGE_TYPE
   ): Subject<any> {
-    const currentSubject = new Subject();
-
     if (!this.sseMap.has(url)) {
+      const currentSubjectNewUrl = new Subject();
       this.sseMap.set(url, new Map());
       this.sseMap
         .get(url)
         ?.set(SSE_SERVICE_CONFIG.DEFAULT_EVENTSOURCE_KEY, new EventSource(url))
         .set(
           SSE_SERVICE_CONFIG.DEFAULT_SUBSCRIPTION_KEY,
-          this.createSubscription(url, type, currentSubject)
+          this.createSubscription(url, type, currentSubjectNewUrl)
         )
-        .set(type, currentSubject);
+        .set(type, currentSubjectNewUrl);
+
+      // Add error handling if new
+      this.createErrorHandling(url);
     } else if (!this.sseMap.get(url)?.has(type) && type != ERROR_MESSAGE_TYPE) {
+      const currentSubjectNewType = new Subject();
       this.createSubscription(
         url,
         type,
-        currentSubject,
+        currentSubjectNewType,
         this.sseMap
           .get(url)
           ?.get(SSE_SERVICE_CONFIG.DEFAULT_SUBSCRIPTION_KEY) as Subscription
       );
-      this.sseMap.get(url)?.set(type, currentSubject);
+      this.sseMap.get(url)?.set(type, currentSubjectNewType);
+    } else if (type === ERROR_MESSAGE_TYPE) {
+      throw new Error(
+        `You should do error handling in observer's Error Callback.`
+      );
     }
 
     return this.sseMap.get(url)?.get(type) as Subject<any>;
@@ -69,51 +78,49 @@ export class SseService {
     this.closeConnection(eventSource);
   }
 
+  /**
+   *
+   * Return sse connection map
+   */
+  getSseConnectionsMap(): SseMap {
+    return this.sseMap;
+  }
+
+  private createErrorHandling(url: string): void {
+    fromEvent(
+      this.sseMap
+        .get(url)
+        ?.get(SSE_SERVICE_CONFIG.DEFAULT_EVENTSOURCE_KEY) as EventSource,
+      ERROR_MESSAGE_TYPE
+    ).subscribe((error) => {
+      this.sseMap.get(url)?.forEach((value) => {
+        if (value instanceof Subject) {
+          value.error(error);
+        }
+      });
+    });
+  }
+
   private createSubscription(
     url: string,
     type: string,
     currentSubject: Subject<any>,
     exSubscription?: Subscription
   ): Subscription {
-    const subscription = exSubscription ?? new Subscription();
+    const subscription =
+      exSubscription instanceof Subscription
+        ? exSubscription
+        : new Subscription();
     subscription.add(
-      this.createFromEvent(
+      fromEvent(
         this.sseMap
           .get(url)
           ?.get(SSE_SERVICE_CONFIG.DEFAULT_EVENTSOURCE_KEY) as EventSource,
-        type,
-        currentSubject
-      )
+        type
+      ).subscribe(currentSubject)
     );
-    if (exSubscription === undefined) {
-      subscription.add(
-        this.createFromEvent(
-          this.sseMap
-            .get(url)
-            ?.get(SSE_SERVICE_CONFIG.DEFAULT_EVENTSOURCE_KEY) as EventSource,
-          ERROR_MESSAGE_TYPE,
-          currentSubject
-        )
-      );
-    }
 
     return subscription;
-  }
-
-  private createFromEvent(
-    eventSource: EventSource,
-    type: string,
-    currentSubject: Subject<any>
-  ): Subscription {
-    if (type == ERROR_MESSAGE_TYPE) {
-      return fromEvent(eventSource, type).subscribe((error) => {
-        currentSubject.error(error);
-        // close connection by default // other implements TODO
-        this.closeConnection(eventSource);
-      });
-    } else {
-      return fromEvent(eventSource, type).subscribe(currentSubject);
-    }
   }
 
   private closeConnection(eventSource: EventSource): void {
