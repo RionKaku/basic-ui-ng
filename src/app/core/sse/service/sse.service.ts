@@ -18,7 +18,10 @@ type SseMap = Map<
   providedIn: 'root',
 })
 export class SseService {
-  private sseMap: SseMap = new Map();
+  private _sseMap: SseMap = new Map();
+  get sseMap() {
+    return this._sseMap;
+  }
 
   /**
    *
@@ -27,14 +30,14 @@ export class SseService {
    * @param type Default value 'message', except 'error',
    * @returns Subject
    */
-  getServerSentEvent(
+  getServerSentEvent<T>(
     url: string,
     type: string = SSE_SERVICE_CONFIG.DEFAULT_MESSAGE_TYPE
   ): Subject<any> {
-    if (!this.sseMap.has(url)) {
+    if (!this._sseMap.has(url)) {
       const currentSubjectNewUrl = new Subject();
-      this.sseMap.set(url, new Map());
-      this.sseMap
+      this._sseMap.set(url, new Map());
+      this._sseMap
         .get(url)
         ?.set(SSE_SERVICE_CONFIG.DEFAULT_EVENTSOURCE_KEY, new EventSource(url))
         .set(
@@ -45,24 +48,27 @@ export class SseService {
 
       // Add error handling if new
       this.createErrorHandling(url);
-    } else if (!this.sseMap.get(url)?.has(type) && type != ERROR_MESSAGE_TYPE) {
+    } else if (
+      !this._sseMap.get(url)?.has(type) &&
+      type != ERROR_MESSAGE_TYPE
+    ) {
       const currentSubjectNewType = new Subject();
       this.createSubscription(
         url,
         type,
         currentSubjectNewType,
-        this.sseMap
+        this._sseMap
           .get(url)
           ?.get(SSE_SERVICE_CONFIG.DEFAULT_SUBSCRIPTION_KEY) as Subscription
       );
-      this.sseMap.get(url)?.set(type, currentSubjectNewType);
+      this._sseMap.get(url)?.set(type, currentSubjectNewType);
     } else if (type === ERROR_MESSAGE_TYPE) {
       throw new Error(
         `You should do error handling in observer's Error Callback.`
       );
     }
 
-    return this.sseMap.get(url)?.get(type) as Subject<any>;
+    return this._sseMap.get(url)?.get(type) as Subject<T>;
   }
 
   /**
@@ -72,28 +78,20 @@ export class SseService {
    * @returns void
    */
   closeServerSentEvent(url: string): void {
-    const eventSource = this.sseMap
+    const eventSource = this._sseMap
       .get(url)
       ?.get(SSE_SERVICE_CONFIG.DEFAULT_EVENTSOURCE_KEY) as EventSource;
     this.closeConnection(eventSource);
   }
 
-  /**
-   *
-   * Return sse connection map
-   */
-  getSseConnectionsMap(): SseMap {
-    return this.sseMap;
-  }
-
   private createErrorHandling(url: string): void {
     fromEvent(
-      this.sseMap
+      this._sseMap
         .get(url)
         ?.get(SSE_SERVICE_CONFIG.DEFAULT_EVENTSOURCE_KEY) as EventSource,
       ERROR_MESSAGE_TYPE
     ).subscribe((error) => {
-      this.sseMap.get(url)?.forEach((value) => {
+      this._sseMap.get(url)?.forEach((value) => {
         if (value instanceof Subject) {
           value.error(error);
         }
@@ -113,7 +111,7 @@ export class SseService {
         : new Subscription();
     subscription.add(
       fromEvent(
-        this.sseMap
+        this._sseMap
           .get(url)
           ?.get(SSE_SERVICE_CONFIG.DEFAULT_EVENTSOURCE_KEY) as EventSource,
         type
@@ -125,11 +123,11 @@ export class SseService {
 
   private closeConnection(eventSource: EventSource): void {
     (
-      this.sseMap
+      this._sseMap
         .get(eventSource.url)
         ?.get(SSE_SERVICE_CONFIG.DEFAULT_SUBSCRIPTION_KEY) as Subscription
     ).unsubscribe();
     eventSource.close();
-    this.sseMap.delete(eventSource.url);
+    this._sseMap.delete(eventSource.url);
   }
 }
