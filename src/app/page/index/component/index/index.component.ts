@@ -13,11 +13,11 @@ interface DataModel {
 }
 
 @Component({
-  selector: 'app-home',
-  templateUrl: './home.component.html',
-  styleUrls: ['./home.component.scss'],
+  selector: 'app-index',
+  templateUrl: './index.component.html',
+  styleUrls: ['./index.component.scss'],
 })
-export class HomeComponent implements OnInit {
+export class IndexComponent implements OnInit {
   constructor(
     private sseServcie: SseService,
     private stateService: StateService

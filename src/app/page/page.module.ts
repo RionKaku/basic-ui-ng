@@ -1,11 +1,10 @@
 import { NgModule } from '@angular/core';
-import { SharedModule } from '../shared/shared.module';
-import { HomeComponent } from './home/home.component';
 import { PageRoutingModule } from './page-routing.module';
-import { SubComponent } from './sub/sub.component';
+import { IndexModule } from './index/index.module';
+import { DashboardModule } from './dashboard/dashboard.module';
 
 @NgModule({
-  declarations: [HomeComponent, SubComponent],
-  imports: [PageRoutingModule, SharedModule],
+  declarations: [],
+  imports: [PageRoutingModule, IndexModule, DashboardModule],
 })
 export class PageModule {}
