@@ -1,12 +1,10 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-
-
+import { StateModule } from 'src/app/core/state/state.module';
+import { SharedModule } from 'src/app/shared/shared.module';
+import { stateConfig } from './reservation.state';
 
 @NgModule({
   declarations: [],
-  imports: [
-    CommonModule
-  ]
+  imports: [SharedModule, StateModule.forFeature(stateConfig)],
 })
-export class ReservationModule { }
+export class ReservationModule {}
