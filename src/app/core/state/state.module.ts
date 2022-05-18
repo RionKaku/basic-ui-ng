@@ -1,6 +1,6 @@
 import { ModuleWithProviders, NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { StateConfig, STATE_KEYS } from './state.config';
+import { StateConfig, STATE_CONF } from './state.config';
 
 @NgModule({
   declarations: [],
@@ -10,7 +10,7 @@ export class StateModule {
   static forFeature(stateKeys: StateConfig): ModuleWithProviders<NgModule> {
     return {
       ngModule: StateModule,
-      providers: [{ provide: STATE_KEYS, useValue: stateKeys, multi: true }],
+      providers: [{ provide: STATE_CONF, useValue: stateKeys, multi: true }],
     };
   }
 }

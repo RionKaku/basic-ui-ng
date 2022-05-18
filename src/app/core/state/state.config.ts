@@ -5,4 +5,4 @@ export interface StateConfig {
   initState: Object;
 }
 
-export const STATE_KEYS = new InjectionToken<StateConfig>('state.keys');
+export const STATE_CONF = new InjectionToken<StateConfig>('state.conf');

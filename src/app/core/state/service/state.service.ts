@@ -1,7 +1,7 @@
 import { Inject, Injectable, Optional } from '@angular/core';
 import { BehaviorSubject, Observable, pluck, take, throwError } from 'rxjs';
 import { isBlank } from 'src/app/util/string';
-import { StateConfig, STATE_KEYS } from '../state.config';
+import { StateConfig, STATE_CONF } from '../state.config';
 
 @Injectable({
   providedIn: 'root',
@@ -9,7 +9,7 @@ import { StateConfig, STATE_KEYS } from '../state.config';
 export class StateService {
   private _state: Map<string, BehaviorSubject<Object>> = new Map();
 
-  constructor(@Inject(STATE_KEYS) @Optional() stateConfig: StateConfig[]) {
+  constructor(@Inject(STATE_CONF) @Optional() stateConfig: StateConfig[]) {
     stateConfig.forEach((eachState) => {
       const featureKey = eachState.featureKey;
       const initState = eachState.initState;
