@@ -2,7 +2,11 @@ import { StateConfig } from 'src/app/core/state/state.config';
 import { ApiGetReservationListReq } from './model/ApiGetReservationList';
 import { Reservation } from './model/reservation';
 
-const featureKey = 'reservation';
+export const ReservationStateConst = {
+  featureKey: 'reservation',
+  reservationList: 'reservationList',
+  reservationReq: 'reservationReq',
+};
 
 const initReservationList: Reservation[] = [];
 
@@ -21,6 +25,6 @@ const initReservatonState: ReservationState = {
 };
 
 export const stateConfig: StateConfig = {
-  featureKey: featureKey,
+  featureKey: ReservationStateConst.featureKey,
   initState: initReservatonState,
 };

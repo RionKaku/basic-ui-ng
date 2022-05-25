@@ -7,6 +7,6 @@ import { stateConfig } from './request.state';
 @NgModule({
   declarations: [RequestIndexComponent],
   imports: [SharedModule, StateModule.forFeature(stateConfig)],
-  exports: [RequestIndexComponent],
+  exports: [],
 })
 export class RequestModule {}

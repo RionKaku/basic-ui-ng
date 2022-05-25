@@ -1,5 +1,12 @@
 import { Inject, Injectable, Optional } from '@angular/core';
-import { BehaviorSubject, Observable, pluck, take, throwError } from 'rxjs';
+import {
+  BehaviorSubject,
+  lastValueFrom,
+  map,
+  Observable,
+  take,
+  throwError,
+} from 'rxjs';
 import { isBlank } from 'src/app/util/string';
 import { StateConfig, STATE_CONF } from '../state.config';
 
@@ -7,14 +14,17 @@ import { StateConfig, STATE_CONF } from '../state.config';
   providedIn: 'root',
 })
 export class StateService {
-  private _state: Map<string, BehaviorSubject<Object>> = new Map();
+  private _state: Map<string, Map<string, BehaviorSubject<any>>> = new Map();
 
   constructor(@Inject(STATE_CONF) @Optional() stateConfig: StateConfig[]) {
     stateConfig.forEach((eachState) => {
       const featureKey = eachState.featureKey;
       const initState = eachState.initState;
       if (!isBlank(featureKey) && !this._state.has(featureKey)) {
-        this._state.set(featureKey, new BehaviorSubject(initState));
+        this._state.set(
+          featureKey,
+          new Map([[featureKey, new BehaviorSubject(initState)]])
+        );
       }
     });
   }
@@ -24,6 +34,7 @@ export class StateService {
     if (this._state.has(featureKey)) {
       this._state
         .get(featureKey)
+        ?.get(featureKey)
         ?.pipe(take(1))
         .subscribe((res) => {
           _resSnapShot = res;
@@ -34,24 +45,41 @@ export class StateService {
     }
   }
 
-  getState(featureKey: string, feature?: string): Observable<any> {
+  getState$(featureKey: string, feature?: string): BehaviorSubject<any> {
     if (isBlank(feature) && this._state.has(featureKey)) {
-      return this._state.get(featureKey) as BehaviorSubject<Object>;
-    } else if (this._state.has(featureKey)) {
       return this._state
         .get(featureKey)
-        ?.pipe(pluck(feature as string)) as Observable<any>;
+        ?.get(featureKey) as BehaviorSubject<any>;
+    } else if (this._state.has(featureKey) && typeof feature == 'string') {
+      const currentMap = this._state.get(featureKey);
+      if (!currentMap?.has(feature)) {
+        currentMap
+          ?.get(featureKey)
+          ?.pipe(take(1))
+          .subscribe((initStateVal) => {
+            currentMap?.set(
+              feature,
+              new BehaviorSubject(initStateVal[feature])
+            );
+          });
+      }
+      return currentMap?.get(feature) as BehaviorSubject<any>;
     } else {
-      return throwError(() => {
-        return new Error('state not found.');
-      });
+      return new BehaviorSubject(null);
     }
   }
 
-  patchState<T>(featureKey: string, fn: (state: T) => T) {
+  patchState<T>(
+    featureKey: string,
+    feature: string,
+    patchValue: any,
+    fn: (state: T) => T
+  ) {
     if (this._state.has(featureKey)) {
       const _snapShot: T = this.getSnapshot(featureKey);
-      this._state.get(featureKey)?.next(fn(_snapShot));
+      const nextFullState = fn(_snapShot);
+      this._state.get(featureKey)?.get(featureKey)?.next(nextFullState);
+      this._state.get(featureKey)?.get(feature)?.next(patchValue);
     }
   }
 }

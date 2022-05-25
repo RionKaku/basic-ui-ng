@@ -7,10 +7,10 @@ import { StateConfig, STATE_CONF } from './state.config';
   imports: [CommonModule],
 })
 export class StateModule {
-  static forFeature(stateKeys: StateConfig): ModuleWithProviders<NgModule> {
+  static forFeature(stateConfig: StateConfig): ModuleWithProviders<NgModule> {
     return {
       ngModule: StateModule,
-      providers: [{ provide: STATE_CONF, useValue: stateKeys, multi: true }],
+      providers: [{ provide: STATE_CONF, useValue: stateConfig, multi: true }],
     };
   }
 }
