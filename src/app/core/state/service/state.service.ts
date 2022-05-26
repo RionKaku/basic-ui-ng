@@ -1,12 +1,5 @@
 import { Inject, Injectable, Optional } from '@angular/core';
-import {
-  BehaviorSubject,
-  lastValueFrom,
-  map,
-  Observable,
-  take,
-  throwError,
-} from 'rxjs';
+import { BehaviorSubject, take } from 'rxjs';
 import { isBlank } from 'src/app/util/string';
 import { StateConfig, STATE_CONF } from '../state.config';
 
@@ -69,16 +62,16 @@ export class StateService {
     }
   }
 
-  patchState<T>(
-    featureKey: string,
-    feature: string,
-    patchValue: any,
-    fn: (state: T) => T
-  ) {
+  patchState<T>(featureKey: string, feature: string, patchValue: any) {
     if (this._state.has(featureKey)) {
       const _snapShot: T = this.getSnapshot(featureKey);
-      const nextFullState = fn(_snapShot);
-      this._state.get(featureKey)?.get(featureKey)?.next(nextFullState);
+      this._state
+        .get(featureKey)
+        ?.get(featureKey)
+        ?.next({
+          ..._snapShot,
+          feature: patchValue,
+        });
       this._state.get(featureKey)?.get(feature)?.next(patchValue);
     }
   }

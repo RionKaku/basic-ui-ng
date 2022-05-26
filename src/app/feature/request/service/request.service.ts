@@ -32,13 +32,7 @@ export class RequestService {
     this.stateService.patchState(
       RequestStateConst.featureKey,
       RequestStateConst.requestReq,
-      patchValue,
-      (state: RequestState): RequestState => {
-        return {
-          ...state,
-          [RequestStateConst.requestReq]: patchValue,
-        };
-      }
+      patchValue
     );
   }
 }

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { map, of } from 'rxjs';
+import { BehaviorSubject, map, of, Subject } from 'rxjs';
 import { SseService } from 'src/app/core/sse/service/sse.service';
 import { StateService } from 'src/app/core/state/service/state.service';
 import { RequestService } from 'src/app/feature/request/service/request.service';
@@ -20,7 +20,7 @@ export class IndexComponent implements OnInit {
   ngOnInit(): void {
     this.requestService.request$.subscribe(console.warn);
     this.requestService.requestList$.subscribe(console.warn);
-    // this.requestService.requestAll$.subscribe(console.log);
+    this.requestService.requestAll$.subscribe(console.log);
     this.requestService.update('hellooo');
     // let aa = of([
     //   {
