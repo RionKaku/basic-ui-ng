@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { StateService } from 'src/app/core/state/service/state.service';
 import { ApiGetRequestListReq } from '../model/ApiGetRequestList';
-import { RequestState, RequestStateConst } from '../request.state';
+import { RequestStateConst } from '../request.state';
 
 @Injectable({
   providedIn: 'root',
@@ -22,10 +22,6 @@ export class RequestService {
       RequestStateConst.featureKey,
       RequestStateConst.requestList
     );
-  }
-
-  public get requestAll$(): Observable<RequestState> {
-    return this.stateService.getState$(RequestStateConst.featureKey);
   }
 
   update(patchValue: any) {

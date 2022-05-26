@@ -21,8 +21,8 @@ const requestList: ServiceRequest[] = [
 ];
 
 const requestReq: ApiGetRequestListReq = {
-  requestId: '',
-  userName: '',
+  requestId: 'ididi',
+  userName: 'rion',
 };
 
 /**
@@ -30,14 +30,14 @@ const requestReq: ApiGetRequestListReq = {
  */
 export interface RequestState {
   requestList: ServiceRequest[];
-  requestReq: string;
+  requestReq: ApiGetRequestListReq;
 }
 /**
  * Request State Init
  */
 const requestState: RequestState = {
   requestList: requestList,
-  requestReq: 'requestReq test',
+  requestReq: requestReq,
 };
 /**
  * Export State Config

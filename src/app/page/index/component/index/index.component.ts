@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { BehaviorSubject, map, of, Subject } from 'rxjs';
+import { map, of, Subject } from 'rxjs';
 import { SseService } from 'src/app/core/sse/service/sse.service';
 import { StateService } from 'src/app/core/state/service/state.service';
 import { RequestService } from 'src/app/feature/request/service/request.service';
@@ -18,36 +18,18 @@ export class IndexComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.requestService.request$.subscribe(console.warn);
-    this.requestService.requestList$.subscribe(console.warn);
-    this.requestService.requestAll$.subscribe(console.log);
-    this.requestService.update('hellooo');
-    // let aa = of([
-    //   {
-    //     a: 1,
-    //     b: 'adsf',
-    //   },
-    //   {
-    //     a: 2,
-    //     b: 'adsf',
-    //   },
-    //   {
-    //     a: 3,
-    //     b: 'adsf',
-    //   },
-    // ]);
-    // aa.pipe(
-    //   map((obj) => {
-    //     let cc;
-    //     Object.entries(obj).forEach(([k, v]) => {
-    //       if (k == '1') {
-    //         cc = v;
-    //       }
-    //     });
-    //     return cc;
-    //   })
-    // ).subscribe(console.log);
-    // this.requestService.update();
+    this.requestService.requestList$.subscribe(console.log);
+    this.requestService.request$.subscribe(console.log);
+    this.requestService.update({
+      requestId: 'd222',
+      userName: 'rion222222',
+    });
+    //
+    // this.requestService.request$.subscribe(console.warn);
+    // this.requestService.requestList$.subscribe(console.warn);
+    // this.requestService.requestAll$.subscribe(console.log);
+    // this.requestService.update('hellooo');
+    //
     // this.stateService.createState('abc', this.abc);
     // this.stateService.states$.subscribe((res: DataModel) => {
     //   console.log(res);
