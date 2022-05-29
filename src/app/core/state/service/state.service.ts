@@ -44,13 +44,13 @@ export class StateService {
     }
   }
 
-  patchState(featureKey: string, feature: string, value: any) {
+  patchState<T>(featureKey: string, feature: string, fn: () => T) {
     if (
       this._state.has(featureKey) &&
       this._state.get(featureKey)?.has(feature) &&
       this._state.get(featureKey)?.get(feature) instanceof BehaviorSubject
     ) {
-      this._state.get(featureKey)?.get(feature).next(value);
+      this._state.get(featureKey)?.get(feature).next(fn());
     }
   }
 }

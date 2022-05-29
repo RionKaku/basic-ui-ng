@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { StateService } from 'src/app/core/state/service/state.service';
 import { ApiGetRequestListReq } from '../model/ApiGetRequestList';
+import { ServiceRequest } from '../model/Request';
 import { RequestStateConst } from '../request.state';
 
 @Injectable({
@@ -17,18 +18,23 @@ export class RequestService {
     );
   }
 
-  public get requestList$(): Observable<ApiGetRequestListReq> {
+  public get requestList$(): Observable<ServiceRequest> {
     return this.stateService.getState$(
       RequestStateConst.featureKey,
       RequestStateConst.requestList
     );
   }
 
-  update(patchValue: any) {
+  update(patchValue: ApiGetRequestListReq) {
     this.stateService.patchState(
       RequestStateConst.featureKey,
       RequestStateConst.requestReq,
-      patchValue
+      (): ApiGetRequestListReq => {
+        return {
+          requestId: 'llll',
+          userName: 'rion3333',
+        };
+      }
     );
   }
 }
